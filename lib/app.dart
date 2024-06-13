@@ -1,5 +1,7 @@
 import 'package:fast_app_base/common/common.dart';
 import 'package:fast_app_base/common/theme/custom_theme_app.dart';
+import 'package:fast_app_base/data/memory/vo/todo_data_holder.dart';
+import 'package:fast_app_base/data/memory/vo/todo_data_notifier.dart';
 import 'package:fast_app_base/screen/main/s_main.dart';
 import 'package:flutter/material.dart';
 
@@ -16,11 +18,15 @@ class App extends StatefulWidget {
 
   @override
   State<App> createState() => AppState();
+  /// App 이 생성될 떄 AppState가 호출되고
 }
 
 class AppState extends State<App> with Nav, WidgetsBindingObserver {
   @override
   GlobalKey<NavigatorState> get navigatorKey => App.navigatorKey;
+
+  /// AppState가 호출되는 시점에 notifier도 만들어진다.
+  final notifier = TodoDataNotifier();
 
   @override
   void initState() {
@@ -31,6 +37,7 @@ class AppState extends State<App> with Nav, WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    notifier.dispose();
     super.dispose();
   }
 
@@ -38,14 +45,17 @@ class AppState extends State<App> with Nav, WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return CustomThemeApp(
       child: Builder(builder: (context) {
-        return MaterialApp(
-          navigatorKey: App.navigatorKey,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          title: 'Image Finder',
-          theme: context.themeType.themeData,
-          home: const MainScreen(),
+        return TodoDataHolder(  // TodoDataHolder를 만들어서 감싸준다.
+          notifier: notifier,
+          child: MaterialApp(
+            navigatorKey: App.navigatorKey,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            title: 'Image Finder',
+            theme: context.themeType.themeData,
+            home: const MainScreen(),
+          ),
         );
       }),
     );

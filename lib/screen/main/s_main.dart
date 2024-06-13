@@ -1,8 +1,13 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:fast_app_base/common/dart/extension/datetime_extension.dart';
+import 'package:fast_app_base/data/memory/vo/todo_data_holder.dart';
 import 'package:fast_app_base/screen/main/tab/tab_item.dart';
 import 'package:fast_app_base/screen/main/tab/tab_navigator.dart';
+import 'package:fast_app_base/screen/main/write/d_write_todo.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/common.dart';
+import '../../data/memory/vo/vo_todo.dart';
 import 'w_menu_drawer.dart';
 
 class MainScreen extends StatefulWidget {
@@ -13,8 +18,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
-  TabItem _currentTab = TabItem.home;
-  final tabs = [TabItem.home, TabItem.favorite];
+  TabItem _currentTab = TabItem.todo;
+  final tabs = [TabItem.todo, TabItem.search];
   final List<GlobalKey<NavigatorState>> navigatorKeys = [];
 
   int get _currentIndex => tabs.indexOf(_currentTab);
@@ -47,13 +52,21 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
             child: pages,
           ),
         ),
+        /// 하단에 플러스 버튼을 띄운다.
+        floatingActionButton: FloatingActionButton(
+          onPressed: ()async{
+            context.holder.addTodo();
+
+          },
+          child: const Icon(EvaIcons.plus),
+        ),
         bottomNavigationBar: _buildBottomNavigationBar(context),
       ),
     );
   }
 
   bool get isRootPage =>
-      _currentTab == TabItem.home && _currentTabNavigationKey.currentState?.canPop() == false;
+      _currentTab == TabItem.todo && _currentTabNavigationKey.currentState?.canPop() == false;
 
   IndexedStack get pages => IndexedStack(
       index: _currentIndex,
@@ -74,8 +87,8 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
         return;
       }
 
-      if (_currentTab != TabItem.home) {
-        _changeTab(tabs.indexOf(TabItem.home));
+      if (_currentTab != TabItem.todo) {
+        _changeTab(tabs.indexOf(TabItem.todo));
       }
     }
   }
